@@ -204,3 +204,23 @@ class PasswordGeneratorApp:
             return None
 
         return garums
+
+    def get_selected_character_pools(self):
+        return [
+            rakstzimes
+            for _, ieslegts_mainigais, rakstzimes in self.rakstzimju_iespejas
+            if ieslegts_mainigais.get()
+        ]
+
+    @staticmethod
+    def create_password(garums, rakstzimju_kopas):
+        paroles_rakstzimes = [secrets.choice(kopa) for kopa in rakstzimju_kopas]
+        visas_rakstzimes = "".join(rakstzimju_kopas)
+
+        paroles_rakstzimes.extend(
+            secrets.choice(visas_rakstzimes)
+            for _ in range(garums - len(paroles_rakstzimes))
+        )
+
+        secrets.SystemRandom().shuffle(paroles_rakstzimes)
+        return "".join(paroles_rakstzimes)
