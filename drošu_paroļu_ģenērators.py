@@ -224,3 +224,14 @@ class PasswordGeneratorApp:
 
         secrets.SystemRandom().shuffle(paroles_rakstzimes)
         return "".join(paroles_rakstzimes)
+    
+    @staticmethod
+    def evaluate_strength(parole, atlasito_veidu_skaits):
+        garums = len(parole)
+        if garums >= 16 and atlasito_veidu_skaits == 4:
+            return "Ļoti droša"
+        if garums >= 12 and atlasito_veidu_skaits >= 3:
+            return "Droša"
+        if garums >= 8 and atlasito_veidu_skaits >= 2:
+            return "Vidēja"
+        return "Vāja"
