@@ -20,3 +20,15 @@ GARUMA_KLUDAS_ZINOJUMS = (
     "Paroles garumam jābūt skaitlim no "
     f"{MINIMALAIS_PAROLES_GARUMS} līdz {MAKSIMALAIS_PAROLES_GARUMS}."
 )
+
+LIELIE_BURTI = string.ascii_uppercase
+MAZIE_BURTI = string.ascii_lowercase
+CIPARI = string.digits
+SIMBOLI = "!@#%&*?+-_="
+
+RAKSTZIMJU_VEIDI = (
+    ("Lielie burti (A-Z)", LIELIE_BURTI),
+    ("Mazie burti (a-z)", MAZIE_BURTI),
+    ("Cipari (0-9)", CIPARI),
+    ("Speciālās rakstzīmes (!@#%&*)", SIMBOLI),
+)
