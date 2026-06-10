@@ -32,3 +32,19 @@ RAKSTZIMJU_VEIDI = (
     ("Cipari (0-9)", CIPARI),
     ("Speciālās rakstzīmes (!@#%&*)", SIMBOLI),
 )
+
+
+class PasswordGeneratorApp:
+
+    def __init__(self, sakne):
+        self.sakne = sakne
+        self.sakne.title("Drošu paroļu ģenerators")
+        self.sakne.geometry("820x620")
+        self.sakne.minsize(760, 560)
+
+        self.garuma_mainigais = tk.StringVar(value=str(NOKLUSETAIS_PAROLES_GARUMS))
+        self.rezultata_mainigais = tk.StringVar(value="")
+        self.drosuma_mainigais = tk.StringVar(value="-")
+        self.rakstzimju_iespejas = self.create_character_options()
+
+        self.build_ui()
