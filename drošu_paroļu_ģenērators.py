@@ -245,3 +245,16 @@ class PasswordGeneratorApp:
         self.sakne.clipboard_append(parole)
         self.sakne.update()
         messagebox.showinfo("Paziņojums", "Parole nokopēta starpliktuvē.")
+
+    def load_json_data(self):
+        if not PAROLU_FAILS.exists():
+            return []
+        try:
+            with PAROLU_FAILS.open("r", encoding="utf-8") as fails:
+                saglabatas_paroles = json.load(fails)
+                return saglabatas_paroles if isinstance(saglabatas_paroles, list) else []
+        except (json.JSONDecodeError, OSError):
+            messagebox.showwarning(
+                "Brīdinājums", "JSON fails ir bojāts. Sākam no jauna."
+            )
+            return []
