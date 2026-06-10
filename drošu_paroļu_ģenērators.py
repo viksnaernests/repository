@@ -235,3 +235,13 @@ class PasswordGeneratorApp:
         if garums >= 8 and atlasito_veidu_skaits >= 2:
             return "Vidēja"
         return "Vāja"
+
+    def copy_password(self):
+        parole = self.rezultata_mainigais.get()
+        if not parole:
+            messagebox.showwarning("Paziņojums", "Nav paroles, ko kopēt.")
+            return
+        self.sakne.clipboard_clear()
+        self.sakne.clipboard_append(parole)
+        self.sakne.update()
+        messagebox.showinfo("Paziņojums", "Parole nokopēta starpliktuvē.")
