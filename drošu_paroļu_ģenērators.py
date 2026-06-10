@@ -258,3 +258,31 @@ class PasswordGeneratorApp:
                 "Brīdinājums", "JSON fails ir bojāts. Sākam no jauna."
             )
             return []
+
+    def save_password_to_json(self):
+        parole = self.rezultata_mainigais.get()
+        if not parole:
+            messagebox.showwarning("Paziņojums", "Nav paroles, ko saglabāt.")
+            return
+
+        apstiprinajums = messagebox.askyesno(
+            "Drošības brīdinājums",
+            "Paroles tiks saglabātas kā vienkāršs teksts. Turpināt?",
+        )
+        if not apstiprinajums:
+            return
+
+        saglabatas_paroles = self.load_json_data()
+        nakamais_id = max(
+            (ieraksts.get("id", 0) for ieraksts in saglabatas_paroles), default=0
+        ) + 1
+
+        jauns_ieraksts = {
+            "id": nakamais_id,
+            "password": parole,
+            "length": len(parole),
+            "strength": self.drosuma_mainigais.get(),
+            "createdAt": datetime.now().isoformat(timespec="seconds"),
+        }
+
+        saglabatas_paroles.append(jauns_ieraksts)
