@@ -68,3 +68,139 @@ class PasswordGeneratorApp:
         self.build_result_area(galvenais)
         self.build_saved_entries(galvenais)
         self.configure_resizing(galvenais)
+
+    def build_header(self, vecaks):
+        tk.Label(
+            vecaks, text="Drošu paroļu ģenerators", font=("Arial", 18, "bold")
+        ).grid(row=0, column=0, columnspan=4, sticky="w", pady=(0, 20))
+
+    def build_length_controls(self, vecaks):
+        tk.Label(vecaks, text="Paroles garums:").grid(row=1, column=0, sticky="w")
+        tk.Entry(vecaks, textvariable=self.garuma_mainigais, width=10).grid(
+            row=1, column=1, sticky="w"
+        )
+        tk.Label(
+            vecaks,
+            text=f"({MINIMALAIS_PAROLES_GARUMS}-{MAKSIMALAIS_PAROLES_GARUMS} rakstzīmes)",
+        ).grid(row=1, column=2, sticky="w")
+
+    def build_character_options(self, vecaks):
+        iespeju_ramis = tk.LabelFrame(vecaks, text="Rakstzīmju veidi", padx=10, pady=10)
+        iespeju_ramis.grid(row=2, column=0, columnspan=4, sticky="we", pady=15)
+
+        for rinda, (nosaukums, ieslegts_mainigais, _) in enumerate(self.rakstzimju_iespejas):
+            tk.Checkbutton(
+                iespeju_ramis,
+                text=nosaukums,
+                variable=ieslegts_mainigais,
+            ).grid(row=rinda, column=0, sticky="w")
+
+    def build_action_buttons(self, vecaks):
+        darbibu_ramis = tk.Frame(vecaks)
+        darbibu_ramis.grid(row=3, column=0, columnspan=4, sticky="we", pady=10)
+
+        pogas = (
+            ("Ģenerēt paroli", self.generate_password),
+            ("Kopēt", self.copy_password),
+            ("Saglabāt JSON", self.save_password_to_json),
+            ("Notīrīt JSON failu", self.clear_json_file),
+        )
+
+        for kolonna, (teksts, komanda) in enumerate(pogas):
+            tk.Button(darbibu_ramis, text=teksts, width=18, command=komanda).grid(
+                row=0,
+                column=kolonna,
+                padx=(0, 10) if kolonna < len(pogas) - 1 else 0,
+                pady=5,
+            )
+
+    def build_result_area(self, vecaks):
+        tk.Label(vecaks, text="Rezultāts:").grid(
+            row=4, column=0, sticky="w", pady=(10, 0)
+        )
+        tk.Entry(
+            vecaks,
+            textvariable=self.rezultata_mainigais,
+            width=75,
+            font=("Consolas", 11),
+        ).grid(row=5, column=0, columnspan=4, sticky="we", pady=5)
+
+        tk.Label(vecaks, text="Paroles drošums:").grid(
+            row=6, column=0, sticky="w", pady=(10, 0)
+        )
+        tk.Label(
+            vecaks,
+            textvariable=self.drosuma_mainigais,
+            font=("Arial", 11, "bold"),
+            relief="groove",
+            width=18,
+            pady=4,
+        ).grid(row=6, column=1, sticky="w", pady=(10, 0))
+
+        bridinajuma_teksts = (
+            "Drošības piezīme: passwords.json fails nav šifrēts. "
+            "Nesaglabājiet šeit īstas kontu paroles, ja fails nav aizsargāts."
+        )
+        tk.Label(
+            vecaks, text=bridinajuma_teksts, fg="darkred", wraplength=720, justify="left"
+        ).grid(row=7, column=0, columnspan=4, sticky="w", pady=15)
+
+    def build_saved_entries(self, vecaks):
+        saglabato_ramis = tk.LabelFrame(vecaks, text="Saglabātie ieraksti", padx=10, pady=10)
+        saglabato_ramis.grid(row=8, column=0, columnspan=4, sticky="nsew", pady=10)
+
+        self.saglabato_saraksts = tk.Listbox(saglabato_ramis, height=10, width=100)
+        self.saglabato_saraksts.grid(row=0, column=0, sticky="nsew")
+
+        ritjosla = tk.Scrollbar(
+            saglabato_ramis, orient="vertical", command=self.saglabato_saraksts.yview
+        )
+        ritjosla.grid(row=0, column=1, sticky="ns")
+        self.saglabato_saraksts.config(yscrollcommand=ritjosla.set)
+
+        tk.Button(
+            saglabato_ramis, text="Atjaunot sarakstu", command=self.refresh_saved_entries
+        ).grid(row=1, column=0, sticky="w", pady=(8, 0))
+
+        saglabato_ramis.columnconfigure(0, weight=1)
+        saglabato_ramis.rowconfigure(0, weight=1)
+
+    @staticmethod
+    def configure_resizing(vecaks):
+        vecaks.columnconfigure(0, weight=1)
+        vecaks.columnconfigure(3, weight=1)
+        vecaks.rowconfigure(8, weight=1)
+
+    def generate_password(self):
+        garums = self.get_password_length()
+        if garums is None:
+            return
+
+        rakstzimju_kopas = self.get_selected_character_pools()
+        if not rakstzimju_kopas:
+            messagebox.showerror(
+                "Kļūda", "Lūdzu, izvēlieties vismaz vienu rakstzīmju veidu."
+            )
+            return
+
+        atlasito_veidu_skaits = len(rakstzimju_kopas)
+        if garums < atlasito_veidu_skaits:
+            messagebox.showerror("Kļūda", "Paroles garums ir pārāk īss.")
+            return
+
+        parole = self.create_password(garums, rakstzimju_kopas)
+        self.rezultata_mainigais.set(parole)
+        self.drosuma_mainigais.set(self.evaluate_strength(parole, atlasito_veidu_skaits))
+
+    def get_password_length(self):
+        try:
+            garums = int(self.garuma_mainigais.get())
+        except ValueError:
+            messagebox.showerror("Kļūda", GARUMA_KLUDAS_ZINOJUMS)
+            return None
+
+        if not (MINIMALAIS_PAROLES_GARUMS <= garums <= MAKSIMALAIS_PAROLES_GARUMS):
+            messagebox.showerror("Kļūda", GARUMA_KLUDAS_ZINOJUMS)
+            return None
+
+        return garums
