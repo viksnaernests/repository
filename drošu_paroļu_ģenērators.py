@@ -313,3 +313,22 @@ class PasswordGeneratorApp:
                 f"Datums: {ieraksts.get('createdAt')}"
             )
             self.saglabato_saraksts.insert(tk.END, attelojamais_teksts)
+
+    def clear_json_file(self):
+        if not PAROLU_FAILS.exists():
+            return
+        if messagebox.askyesno(
+            "Apstiprinājums", "Vai tiešām vēlaties dzēst VISAS saglabātās paroles?"
+        ):
+            try:
+                PAROLU_FAILS.unlink(missing_ok=True)
+            except OSError as kluda:
+                messagebox.showerror("Kļūda", f"Neizdevās notīrīt JSON failu:\n{kluda}")
+                return
+            self.refresh_saved_entries()
+
+
+if __name__ == "__main__":
+    sakne = tk.Tk()
+    lietotne = PasswordGeneratorApp(sakne)
+    sakne.mainloop()
