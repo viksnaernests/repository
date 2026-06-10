@@ -48,3 +48,23 @@ class PasswordGeneratorApp:
         self.rakstzimju_iespejas = self.create_character_options()
 
         self.build_ui()
+        self.refresh_saved_entries()
+
+    @staticmethod
+    def create_character_options():
+        return tuple(
+            (nosaukums, tk.BooleanVar(value=True), rakstzimes)
+            for nosaukums, rakstzimes in RAKSTZIMJU_VEIDI
+        )
+
+    def build_ui(self):
+        galvenais = tk.Frame(self.sakne, padx=20, pady=20)
+        galvenais.pack(fill="both", expand=True)
+
+        self.build_header(galvenais)
+        self.build_length_controls(galvenais)
+        self.build_character_options(galvenais)
+        self.build_action_buttons(galvenais)
+        self.build_result_area(galvenais)
+        self.build_saved_entries(galvenais)
+        self.configure_resizing(galvenais)
