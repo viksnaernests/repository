@@ -286,3 +286,13 @@ class PasswordGeneratorApp:
         }
 
         saglabatas_paroles.append(jauns_ieraksts)
+
+        try:
+            with PAROLU_FAILS.open("w", encoding="utf-8") as fails:
+                json.dump(saglabatas_paroles, fails, ensure_ascii=False, indent=4)
+        except OSError as kluda:
+            messagebox.showerror("Kļūda", f"Neizdevās saglabāt paroles:\n{kluda}")
+            return
+
+        self.refresh_saved_entries()
+        messagebox.showinfo("Paziņojums", "Parole veiksmīgi saglabāta.")
