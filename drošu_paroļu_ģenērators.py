@@ -296,3 +296,20 @@ class PasswordGeneratorApp:
 
         self.refresh_saved_entries()
         messagebox.showinfo("Paziņojums", "Parole veiksmīgi saglabāta.")
+
+    def refresh_saved_entries(self):
+        self.saglabato_saraksts.delete(0, tk.END)
+        saglabatas_paroles = self.load_json_data()
+
+        if not saglabatas_paroles:
+            self.saglabato_saraksts.insert(tk.END, "Vēl nav saglabātu paroļu.")
+            return
+
+        for ieraksts in saglabatas_paroles:
+            attelojamais_teksts = (
+                f"ID: {ieraksts.get('id')} | "
+                f"Parole: {ieraksts.get('password')} | "
+                f"Drošums: {ieraksts.get('strength')} | "
+                f"Datums: {ieraksts.get('createdAt')}"
+            )
+            self.saglabato_saraksts.insert(tk.END, attelojamais_teksts)
